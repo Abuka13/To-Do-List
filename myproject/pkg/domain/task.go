@@ -14,24 +14,24 @@ const (
 )
 
 type Task struct {
-	ID          int        `json:"id"`
-	Title       string     `json:"title"`
-	IsCompleted bool       `json:"isCompleted"`
-	CreatedAt   time.Time  `json:"createdAt"`
-	CompletedAt *time.Time `json:"completedAt,omitempty"`
-	DueDate     *time.Time `json:"dueDate,omitempty"`
-	Priority    Priority   `json:"priority"`
+	ID          int      `json:"id"`
+	Title       string   `json:"title"`
+	IsCompleted bool     `json:"isCompleted"`
+	CreatedAt   string   `json:"createdAt"`
+	CompletedAt string   `json:"completedAt,omitempty"`
+	DueDate     string   `json:"dueDate,omitempty"`
+	Priority    Priority `json:"priority"`
 }
 
 // NewTask - конструктор задач. Использовал здесь фабричный паттерн
-func NewTask(title string, priority Priority, dueDate *time.Time) *Task {
+func NewTask(title string, priority Priority, dueDate string) *Task {
 	return &Task{
 		Title:       title,
 		IsCompleted: false,
 		Priority:    priority,
 		DueDate:     dueDate,
-		CreatedAt:   time.Now().UTC(),
-		CompletedAt: nil,
+		CreatedAt:   time.Now().UTC().Format(time.RFC3339),
+		CompletedAt: "",
 	}
 }
 
@@ -39,8 +39,7 @@ func NewTask(title string, priority Priority, dueDate *time.Time) *Task {
 func (t *Task) Complete() {
 	if !t.IsCompleted {
 		t.IsCompleted = true
-		now := time.Now().UTC()
-		t.CompletedAt = &now
+		t.CompletedAt = time.Now().UTC().Format(time.RFC3339)
 	}
 }
 
@@ -48,7 +47,7 @@ func (t *Task) Complete() {
 func (t *Task) Reopen() {
 	if t.IsCompleted {
 		t.IsCompleted = false
-		t.CompletedAt = nil
+		t.CompletedAt = ""
 	}
 }
 
@@ -62,8 +61,14 @@ func (t *Task) Validate() error {
 
 // эта функция чтобы проверить не просрочена ли задача
 func (t *Task) IsOverdue() bool {
-	if t.DueDate == nil || t.IsCompleted {
+	if t.DueDate == "" || t.IsCompleted {
 		return false
 	}
-	return t.DueDate.Before(time.Now().UTC())
+
+	dueTime, err := time.Parse(time.RFC3339, t.DueDate)
+	if err != nil {
+		return false
+	}
+
+	return dueTime.Before(time.Now().UTC())
 }

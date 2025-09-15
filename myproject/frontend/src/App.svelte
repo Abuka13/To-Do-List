@@ -1,79 +1,68 @@
 <script>
-  import logo from './assets/images/logo-universal.png'
-  import {Greet} from '../wailsjs/go/main/App.js'
+  import { onMount } from 'svelte';
+  import AddTaskForm from './components/AddTaskForm.svelte';
+  import TaskList from './components/TaskList.svelte';
 
-  let resultText = "Please enter your name below 👇"
-  let name
+  let tasks = [];
+  let loading = true;
 
-  function greet() {
-    Greet(name).then(result => resultText = result)
+  onMount(async () => {
+    // Ждем инициализации Wails
+    await waitForWails();
+    await loadTasks();
+  });
+
+  // Функция для ожидания инициализации Wails
+  async function waitForWails() {
+    const maxAttempts = 50;
+    const delay = 100;
+
+    for (let i = 0; i < maxAttempts; i++) {
+      if (window.go && window.go.main && window.go.main.App) {
+        return true;
+      }
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+
+    throw new Error('Wails runtime not available');
+  }
+
+  async function loadTasks() {
+    try {
+      loading = true;
+      tasks = await window.go.main.App.GetAllTasks();
+    } catch (error) {
+      console.error('Ошибка загрузки задач:', error);
+    } finally {
+      loading = false;
+    }
   }
 </script>
 
 <main>
-  <img alt="Wails logo" id="logo" src="{logo}">
-  <div class="result" id="result">{resultText}</div>
-  <div class="input-box" id="input">
-    <input autocomplete="off" bind:value={name} class="input" id="name" type="text"/>
-    <button class="btn" on:click={greet}>Greet</button>
-  </div>
+  <h1>To-Do List</h1>
+
+  <!-- Добавляем нашу форму -->
+  <AddTaskForm onTaskAdded={loadTasks} />
+
+  <!-- Здесь будет список задач -->
+  {#if loading}
+    <p>Загрузка...</p>
+  {:else}
+    <TaskList {tasks} onTaskUpdated={loadTasks} />
+  {/if}
 </main>
 
 <style>
-
-  #logo {
-    display: block;
-    width: 50%;
-    height: 50%;
-    margin: auto;
-    padding: 10% 0 0;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    background-origin: content-box;
+  main {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
   }
 
-  .result {
-    height: 20px;
-    line-height: 20px;
-    margin: 1.5rem auto;
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
   }
-
-  .input-box .btn {
-    width: 60px;
-    height: 30px;
-    line-height: 30px;
-    border-radius: 3px;
-    border: none;
-    margin: 0 0 0 20px;
-    padding: 0 8px;
-    cursor: pointer;
-  }
-
-  .input-box .btn:hover {
-    background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
-    color: #333333;
-  }
-
-  .input-box .input {
-    border: none;
-    border-radius: 3px;
-    outline: none;
-    height: 30px;
-    line-height: 30px;
-    padding: 0 10px;
-    background-color: rgba(240, 240, 240, 1);
-    -webkit-font-smoothing: antialiased;
-  }
-
-  .input-box .input:hover {
-    border: none;
-    background-color: rgba(255, 255, 255, 1);
-  }
-
-  .input-box .input:focus {
-    border: none;
-    background-color: rgba(255, 255, 255, 1);
-  }
-
 </style>

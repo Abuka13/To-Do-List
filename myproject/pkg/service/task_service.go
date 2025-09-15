@@ -26,7 +26,7 @@ func (s *TaskService) GetAllTasks() ([]*domain.Task, error) {
 }
 
 // СОздание задачи
-func (s *TaskService) CreateTask(title string, priority domain.Priority, dueDate *time.Time) (*domain.Task, error) {
+func (s *TaskService) CreateTask(title string, priority domain.Priority, dueDate string) (*domain.Task, error) {
 	newTask := domain.NewTask(title, priority, dueDate)
 	if err := newTask.Validate(); err != nil {
 		return nil, err
@@ -77,8 +77,12 @@ func (s *TaskService) GetTasksDueToday() ([]*domain.Task, error) {
 	var dueToday []*domain.Task
 	today := time.Now().UTC().Truncate(24 * time.Hour) // Начало текущих суток
 	for _, task := range allTasks {
-		if task.DueDate != nil {
-			dueDate := task.DueDate.Truncate(24 * time.Hour)
+		if task.DueDate != "" {
+			dueTime, err := time.Parse(time.RFC3339, task.DueDate)
+			if err != nil {
+				continue
+			}
+			dueDate := dueTime.Truncate(24 * time.Hour)
 			if dueDate.Equal(today) {
 				dueToday = append(dueToday, task)
 			}
