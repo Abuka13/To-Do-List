@@ -13,6 +13,14 @@ const (
 	PriorityHigh   Priority = "high"
 )
 
+type TaskFilter string
+
+const (
+	FilterAll       TaskFilter = "all"
+	FilterActive    TaskFilter = "active"
+	FilterCompleted TaskFilter = "completed"
+)
+
 type Task struct {
 	ID          int      `json:"id"`
 	Title       string   `json:"title"`

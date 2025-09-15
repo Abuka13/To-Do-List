@@ -10,6 +10,8 @@ export function GetAllTasks():Promise<Array<domain.Task>>;
 
 export function GetStats():Promise<Record<string, number>>;
 
+export function GetTasksByFilter(arg1:string):Promise<Array<domain.Task>>;
+
 export function SearchTasks(arg1:string):Promise<Array<domain.Task>>;
 
 export function TestMethod():Promise<string>;

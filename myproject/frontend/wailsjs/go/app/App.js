@@ -18,6 +18,10 @@ export function GetStats() {
   return window['go']['app']['App']['GetStats']();
 }
 
+export function GetTasksByFilter(arg1) {
+  return window['go']['app']['App']['GetTasksByFilter'](arg1);
+}
+
 export function SearchTasks(arg1) {
   return window['go']['app']['App']['SearchTasks'](arg1);
 }

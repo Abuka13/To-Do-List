@@ -9,6 +9,7 @@ declare interface Window {
                 DeleteTask(id: number): Promise<void>;
                 GetStats(): Promise<Record<string, number>>;
                 TestMethod(): Promise<string>;
+                GetTasksByFilter(filter: string): Promise<any[]>; // ДОБАВЛЕНО
             }
         }
     }

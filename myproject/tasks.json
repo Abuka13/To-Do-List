@@ -14,5 +14,13 @@
     "createdAt": "2025-09-15T19:31:55Z",
     "dueDate": "2025-09-16T10:00:00.000Z",
     "priority": "medium"
+  },
+  {
+    "id": 3,
+    "title": "Починить фильтр",
+    "isCompleted": false,
+    "createdAt": "2025-09-15T20:53:00Z",
+    "dueDate": "2025-09-15T22:00:00.000Z",
+    "priority": "low"
   }
 ]

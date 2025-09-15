@@ -5,8 +5,10 @@ import (
 	"errors"
 	"myproject/pkg/domain"
 	"os"
+	"sort"
 	"strings"
 	"sync"
+	"time"
 )
 
 // JSONTaskRepository - конкретная реализация TaskRepository для хранения в JSON файле.
@@ -158,6 +160,36 @@ func (r *JSONTaskRepository) persistToFile() error {
 
 	// Создаем файл если не существует, с правами 0644 (rw-r--r--)
 	return os.WriteFile(r.filePath, data, 0644)
+}
+func (r *JSONTaskRepository) FindByFilter(filter domain.TaskFilter) ([]*domain.Task, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var filteredTasks []*domain.Task
+
+	for _, task := range r.tasks {
+		switch filter {
+		case domain.FilterAll:
+			filteredTasks = append(filteredTasks, task)
+		case domain.FilterActive:
+			if !task.IsCompleted {
+				filteredTasks = append(filteredTasks, task)
+			}
+		case domain.FilterCompleted:
+			if task.IsCompleted {
+				filteredTasks = append(filteredTasks, task)
+			}
+		}
+	}
+
+	// Сортировка по дате создания (новые сначала)
+	sort.Slice(filteredTasks, func(i, j int) bool {
+		timeI, _ := time.Parse(time.RFC3339, filteredTasks[i].CreatedAt)
+		timeJ, _ := time.Parse(time.RFC3339, filteredTasks[j].CreatedAt)
+		return timeI.After(timeJ)
+	})
+
+	return filteredTasks, nil
 }
 
 // Функция чтобы посмотреть сколько задач в общем и сколько выполенных

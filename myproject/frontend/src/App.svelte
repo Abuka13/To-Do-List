@@ -2,11 +2,13 @@
     import {onMount} from 'svelte';
     import AddTaskForm from './components/AddTaskForm.svelte';
     import TaskList from './components/TaskList.svelte';
+    import TaskFilter from './components/TaskFilter.svelte';
 
     let tasks = [];
     let loading = true;
     let wailsReady = false;
     let errorMessage = '';
+    let currentFilter = 'all';
 
     onMount(async () => {
         console.log('App mounted');
@@ -66,6 +68,25 @@
             loading = false;
         }
     }
+
+    function handleFilterChange(event) {
+        tasks = event.detail.tasks;
+        currentFilter = event.detail.filter;
+    }
+
+    async function refreshTasks() {
+        // При изменении задач перезагружаем с текущим фильтром
+        try {
+            if (currentFilter === 'all') {
+                await loadTasks();
+            } else {
+                const filteredTasks = await window.go.app.App.GetTasksByFilter(currentFilter);
+                tasks = filteredTasks;
+            }
+        } catch (error) {
+            console.error('Ошибка при обновлении задач:', error);
+        }
+    }
 </script>
 
 <main>
@@ -87,14 +108,30 @@
     {/if}
 
     {#if wailsReady}
-        <AddTaskForm onTaskAdded={loadTasks}/>
+        <AddTaskForm onTaskAdded={refreshTasks}/>
+
+        {#if tasks.length > 0}
+            <TaskFilter
+                    {currentFilter}
+                    on:filterchange={handleFilterChange}
+            />
+        {/if}
 
         {#if loading}
             <div class="loading">
                 <p>Загрузка задач...</p>
             </div>
         {:else}
-            <TaskList {tasks} onTaskUpdated={loadTasks}/>
+            <TaskList {tasks} onTaskUpdated={refreshTasks}/>
+
+            <div class="stats">
+                Всего: {tasks.length} |
+                Активные: {tasks.filter(t => !t.isCompleted).length} |
+                Выполненные: {tasks.filter(t => t.isCompleted).length}
+                {#if currentFilter !== 'all'}
+                    <span class="filter-info">(фильтр: {currentFilter === 'active' ? 'активные' : 'выполненные'})</span>
+                {/if}
+            </div>
         {/if}
     {/if}
 </main>
@@ -154,5 +191,21 @@
 
     .retry-btn:hover {
         background: #c82333;
+    }
+
+    .stats {
+        margin-top: 20px;
+        padding: 12px;
+        background: #e9ecef;
+        border-radius: 6px;
+        text-align: center;
+        font-size: 14px;
+        color: #495057;
+    }
+
+    .filter-info {
+        font-style: italic;
+        color: #6c757d;
+        margin-left: 10px;
     }
 </style>

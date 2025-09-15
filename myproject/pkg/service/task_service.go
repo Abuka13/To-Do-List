@@ -64,6 +64,9 @@ func (s *TaskService) ToggleTaskCompletion(id int) (*domain.Task, error) {
 	}
 	return task, nil
 }
+func (s *TaskService) GetTasksByFilter(filter domain.TaskFilter) ([]*domain.Task, error) {
+	return s.repo.FindByFilter(filter)
+}
 func (s *TaskService) DeleteTask(id int) error {
 	return s.repo.Delete(id)
 }

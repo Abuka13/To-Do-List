@@ -105,7 +105,18 @@ func (a *App) DeleteTask(id int) error {
 	fmt.Printf("Задача ID=%d удалена\n", id)
 	return nil
 }
+func (a *App) GetTasksByFilter(filter string) ([]*Task, error) {
+	fmt.Printf("App.GetTasksByFilter() вызван: filter=%s\n", filter)
 
+	tasks, err := a.taskService.GetTasksByFilter(domain.TaskFilter(filter))
+	if err != nil {
+		fmt.Printf("Ошибка фильтрации задач: %v\n", err)
+		return nil, err
+	}
+
+	fmt.Printf("Отфильтровано %d задач\n", len(tasks))
+	return tasks, nil
+}
 func (a *App) GetStats() (map[string]int, error) {
 	fmt.Println("App.GetStats() вызван")
 
