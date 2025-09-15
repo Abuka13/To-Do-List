@@ -8,7 +8,6 @@
     async function addTask() {
         console.log('Кнопка добавления нажата');
 
-        // ИСПРАВЛЕННЫЙ ПУТЬ!
         if (!window.go?.app?.App?.CreateTask) {
             console.error('Wails runtime недоступен');
             alert('Ошибка: соединение с приложением потеряно');
@@ -90,37 +89,40 @@
         flex: 1;
         min-width: 200px;
         padding: 12px;
-        border: 2px solid #e0e0e0;
+        border: 2px solid var(--border-color);
         border-radius: 8px;
         font-size: 14px;
         transition: border-color 0.2s ease;
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
     }
 
     .task-input:focus {
         outline: none;
-        border-color: #007bff;
+        border-color: var(--accent-color);
         box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     }
 
     .priority-select, .date-input {
         padding: 12px;
-        border: 2px solid #e0e0e0;
+        border: 2px solid var(--border-color);
         border-radius: 8px;
         font-size: 14px;
-        background-color: white;
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
         cursor: pointer;
         transition: border-color 0.2s ease;
     }
 
     .priority-select:focus, .date-input:focus {
         outline: none;
-        border-color: #007bff;
+        border-color: var(--accent-color);
         box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     }
 
     .add-button {
         padding: 12px 20px;
-        background-color: #007bff;
+        background-color: var(--accent-color);
         color: white;
         border: none;
         border-radius: 8px;
@@ -131,7 +133,7 @@
     }
 
     .add-button:hover {
-        background-color: #0056b3;
+        opacity: 0.9;
         transform: translateY(-1px);
     }
 

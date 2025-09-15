@@ -13,6 +13,22 @@ const (
 	PriorityHigh   Priority = "high"
 )
 
+type DateFilter string
+
+const (
+	DateFilterToday   DateFilter = "today"
+	DateFilterWeek    DateFilter = "week"
+	DateFilterOverdue DateFilter = "overdue"
+	DateFilterAll     DateFilter = "all"
+)
+
+type SortBy string
+
+const (
+	SortByDate     SortBy = "date"
+	SortByPriority SortBy = "priority"
+)
+
 type TaskFilter string
 
 const (
