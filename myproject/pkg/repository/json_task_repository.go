@@ -45,6 +45,19 @@ func (r *JSONTaskRepository) FindAll() ([]*domain.Task, error) {
 	return result, nil
 }
 
+// Ищет по ID
+func (r *JSONTaskRepository) FindByID(id int) (*domain.Task, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	for _, task := range r.tasks {
+		if task.ID == id {
+			foundTask := *task
+			return &foundTask, nil
+		}
+	}
+	return nil, errors.New("task not found")
+}
+
 // Ищет по title
 func (r *JSONTaskRepository) FindByTitle(title string) ([]*domain.Task, error) {
 	r.mu.RLock()
