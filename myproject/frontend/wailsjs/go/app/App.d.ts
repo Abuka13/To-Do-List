@@ -12,4 +12,6 @@ export function GetStats():Promise<Record<string, number>>;
 
 export function SearchTasks(arg1:string):Promise<Array<domain.Task>>;
 
+export function TestMethod():Promise<string>;
+
 export function ToggleTaskCompletion(arg1:number):Promise<domain.Task>;

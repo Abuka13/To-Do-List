@@ -3,32 +3,43 @@
     export let onTaskUpdated = () => {};
 
     async function toggleTaskCompletion(task) {
-        if (!window.go?.main?.App) {
-            console.error('Wails runtime not available');
+        // ИСПРАВЛЕННЫЙ ПУТЬ!
+        if (!window.go?.app?.App?.ToggleTaskCompletion) {
+            console.error('Wails runtime недоступен');
+            alert('Ошибка: соединение с приложением потеряно');
             return;
         }
 
         try {
-            const updatedTask = await window.go.main.App.ToggleTaskCompletion(task.id);
+            console.log('Переключение статуса задачи:', task.id);
+            const updatedTask = await window.go.app.App.ToggleTaskCompletion(task.id);
+            console.log('Статус переключен:', updatedTask);
+
             tasks = tasks.map(t => t.id === updatedTask.id ? updatedTask : t);
             onTaskUpdated();
         } catch (error) {
             console.error('Ошибка при обновлении задачи:', error);
+            alert('Ошибка при обновлении задачи: ' + (error.message || error));
         }
     }
 
     async function deleteTask(taskId) {
-        if (!window.go?.main?.App) {
-            console.error('Wails runtime not available');
+        // ИСПРАВЛЕННЫЙ ПУТЬ!
+        if (!window.go?.app?.App?.DeleteTask) {
+            console.error('Wails runtime недоступен');
+            alert('Ошибка: соединение с приложением потеряно');
             return;
         }
 
         if (confirm('Вы уверены, что хотите удалить эту задачу?')) {
             try {
-                await window.go.main.App.DeleteTask(taskId);
+                console.log('Удаление задачи:', taskId);
+                await window.go.app.App.DeleteTask(taskId);
+                console.log('Задача удалена:', taskId);
                 onTaskUpdated();
             } catch (error) {
                 console.error('Ошибка при удалении задачи:', error);
+                alert('Ошибка при удалении задачи: ' + (error.message || error));
             }
         }
     }
@@ -47,10 +58,14 @@
 
     function getPriorityClass(priority) {
         switch (priority) {
-            case 'high': return 'priority-high';
-            case 'medium': return 'priority-medium';
-            case 'low': return 'priority-low';
-            default: return '';
+            case 'high':
+                return 'priority-high';
+            case 'medium':
+                return 'priority-medium';
+            case 'low':
+                return 'priority-low';
+            default:
+                return '';
         }
     }
 
@@ -62,7 +77,7 @@
 
 <div class="task-list">
     {#if tasks.length === 0}
-        <p class="empty-state">Задач пока нет</p>
+        <p class="empty-state">Задач пока нет. Создайте свою первую задачу!</p>
     {:else}
         {#each tasks as task (task.id)}
             <div class="task-item {task.isCompleted ? 'completed' : ''} {getPriorityClass(task.priority)}">
@@ -82,7 +97,9 @@
                         {#if task.dueDate}
                             <span class="task-due-date {isOverdue(task.dueDate) && !task.isCompleted ? 'overdue' : ''}">
                                 📅 {formatDate(task.dueDate)}
-                                {isOverdue(task.dueDate) && !task.isCompleted ? ' (Просрочено)' : ''}
+                                {#if isOverdue(task.dueDate) && !task.isCompleted}
+                                    <span class="overdue-label">(Просрочено)</span>
+                                {/if}
                             </span>
                         {/if}
 
@@ -92,6 +109,10 @@
                             {:else if task.priority === 'medium'}Средний
                             {:else}Низкий
                             {/if}
+                        </span>
+
+                        <span class="task-created">
+                            Создано: {formatDate(task.createdAt)}
                         </span>
                     </div>
                 </div>
@@ -120,6 +141,9 @@
         color: #666;
         font-style: italic;
         padding: 40px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 2px dashed #dee2e6;
     }
 
     .task-item {
@@ -131,10 +155,12 @@
         border-radius: 8px;
         background: white;
         transition: all 0.3s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
     .task-item:hover {
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        transform: translateY(-1px);
     }
 
     .task-item.completed {
@@ -160,11 +186,13 @@
         display: flex;
         flex-direction: column;
         gap: 4px;
+        flex: 1;
     }
 
     .task-title {
         font-size: 16px;
         font-weight: 500;
+        margin-bottom: 4px;
     }
 
     .completed-text {
@@ -182,9 +210,19 @@
         font-weight: bold;
     }
 
+    .overdue-label {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
     .task-priority {
         font-size: 12px;
         color: #666;
+    }
+
+    .task-created {
+        font-size: 11px;
+        color: #999;
     }
 
     .delete-button {
@@ -198,10 +236,9 @@
     }
 
     .delete-button:hover {
-        background-color: #f8f9fa;
+        background-color: #ffe6e6;
     }
 
-    /* Стили для приоритетов */
     .priority-high {
         border-left: 4px solid #dc3545;
     }

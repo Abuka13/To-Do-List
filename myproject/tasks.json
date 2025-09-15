@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "title": "Проект",
+    "isCompleted": false,
+    "createdAt": "2025-09-15T19:06:43Z",
+    "dueDate": "2025-09-16T17:00:00.000Z",
+    "priority": "high"
+  },
+  {
+    "id": 2,
+    "title": "Домашка",
+    "isCompleted": false,
+    "createdAt": "2025-09-15T19:31:55Z",
+    "dueDate": "2025-09-16T10:00:00.000Z",
+    "priority": "medium"
+  }
+]

@@ -22,6 +22,10 @@ export function SearchTasks(arg1) {
   return window['go']['app']['App']['SearchTasks'](arg1);
 }
 
+export function TestMethod() {
+  return window['go']['app']['App']['TestMethod']();
+}
+
 export function ToggleTaskCompletion(arg1) {
   return window['go']['app']['App']['ToggleTaskCompletion'](arg1);
 }

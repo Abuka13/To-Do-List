@@ -1,6 +1,4 @@
 <script>
-    import { onMount } from 'svelte';
-
     let newTaskTitle = "";
     let newTaskPriority = "medium";
     let newTaskDueDate = "";
@@ -8,28 +6,40 @@
     export let onTaskAdded = () => {};
 
     async function addTask() {
-        if (!window.go || !window.go.main || !window.go.main.App) {
-            console.error('Wails runtime not available');
+        console.log('Кнопка добавления нажата');
+
+        // ИСПРАВЛЕННЫЙ ПУТЬ!
+        if (!window.go?.app?.App?.CreateTask) {
+            console.error('Wails runtime недоступен');
+            alert('Ошибка: соединение с приложением потеряно');
             return;
         }
 
-        if (newTaskTitle.trim()) {
-            try {
-                await window.go.main.App.CreateTask(
-                    newTaskTitle.trim(),
-                    newTaskPriority,
-                    newTaskDueDate
-                );
+        if (!newTaskTitle.trim()) {
+            alert('Введите название задачи!');
+            return;
+        }
 
-                newTaskTitle = "";
-                newTaskPriority = "medium";
-                newTaskDueDate = "";
+        try {
+            console.log('Отправка запроса на создание задачи...');
 
-                onTaskAdded();
+            const result = await window.go.app.App.CreateTask(
+                newTaskTitle.trim(),
+                newTaskPriority,
+                newTaskDueDate ? new Date(newTaskDueDate).toISOString() : ""
+            );
 
-            } catch (error) {
-                console.error("Ошибка при добавлении задачи:", error);
-            }
+            console.log('Задача создана успешно:', result);
+
+            newTaskTitle = "";
+            newTaskPriority = "medium";
+            newTaskDueDate = "";
+
+            onTaskAdded();
+
+        } catch (error) {
+            console.error('Ошибка создания задачи:', error);
+            alert('Ошибка при создании задачи: ' + (error.message || error));
         }
     }
 
@@ -59,6 +69,7 @@
             type="datetime-local"
             bind:value={newTaskDueDate}
             class="date-input"
+            title="Дата и время выполнения"
     />
 
     <button on:click={addTask} class="add-button">
@@ -72,31 +83,70 @@
         gap: 10px;
         margin-bottom: 20px;
         align-items: center;
+        flex-wrap: wrap;
     }
 
     .task-input {
         flex: 1;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
+        min-width: 200px;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border-color 0.2s ease;
+    }
+
+    .task-input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     }
 
     .priority-select, .date-input {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        background-color: white;
+        cursor: pointer;
+        transition: border-color 0.2s ease;
+    }
+
+    .priority-select:focus, .date-input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     }
 
     .add-button {
-        padding: 8px 16px;
+        padding: 12px 20px;
         background-color: #007bff;
         color: white;
         border: none;
-        border-radius: 4px;
+        border-radius: 8px;
         cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease;
     }
 
     .add-button:hover {
         background-color: #0056b3;
+        transform: translateY(-1px);
+    }
+
+    .add-button:active {
+        transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+        .add-task-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .task-input, .priority-select, .date-input, .add-button {
+            width: 100%;
+        }
     }
 </style>

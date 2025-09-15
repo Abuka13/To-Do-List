@@ -1,68 +1,158 @@
 <script>
-  import { onMount } from 'svelte';
-  import AddTaskForm from './components/AddTaskForm.svelte';
-  import TaskList from './components/TaskList.svelte';
+    import {onMount} from 'svelte';
+    import AddTaskForm from './components/AddTaskForm.svelte';
+    import TaskList from './components/TaskList.svelte';
 
-  let tasks = [];
-  let loading = true;
+    let tasks = [];
+    let loading = true;
+    let wailsReady = false;
+    let errorMessage = '';
 
-  onMount(async () => {
-    // Ждем инициализации Wails
-    await waitForWails();
-    await loadTasks();
-  });
+    onMount(async () => {
+        console.log('App mounted');
+        await initializeApp();
+    });
 
-  // Функция для ожидания инициализации Wails
-  async function waitForWails() {
-    const maxAttempts = 50;
-    const delay = 100;
+    async function initializeApp() {
+        console.log('Инициализация приложения...');
 
-    for (let i = 0; i < maxAttempts; i++) {
-      if (window.go && window.go.main && window.go.main.App) {
-        return true;
-      }
-      await new Promise(resolve => setTimeout(resolve, delay));
+        const waitForWails = async () => {
+            let attempts = 0;
+            const maxAttempts = 100;
+
+            while (attempts < maxAttempts) {
+                // ИСПРАВЛЕННЫЙ ПУТЬ!
+                if (window.go?.app?.App?.GetAllTasks) {
+                    console.log('Wails runtime готов!');
+                    wailsReady = true;
+                    await loadTasks();
+                    return true;
+                }
+
+                console.log(`Ожидание Wails runtime... попытка ${attempts + 1}/${maxAttempts}`);
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+
+            console.error('Не удалось подключиться к Wails runtime');
+            errorMessage = 'Не удалось подключиться к backend приложения';
+            loading = false;
+            return false;
+        };
+
+        await waitForWails();
     }
 
-    throw new Error('Wails runtime not available');
-  }
+    async function loadTasks() {
+        try {
+            console.log('Загрузка задач...');
+            loading = true;
+            errorMessage = '';
 
-  async function loadTasks() {
-    try {
-      loading = true;
-      tasks = await window.go.main.App.GetAllTasks();
-    } catch (error) {
-      console.error('Ошибка загрузки задач:', error);
-    } finally {
-      loading = false;
+            // ИСПРАВЛЕННЫЙ ПУТЬ!
+            if (!window.go?.app?.App?.GetAllTasks) {
+                throw new Error('Wails runtime недоступен');
+            }
+
+            const loadedTasks = await window.go.app.App.GetAllTasks();
+            tasks = loadedTasks || [];
+            console.log('Задачи загружены:', tasks);
+
+        } catch (error) {
+            console.error('Ошибка загрузки задач:', error);
+            errorMessage = `Ошибка загрузки: ${error.message}`;
+            tasks = [];
+        } finally {
+            loading = false;
+        }
     }
-  }
 </script>
 
 <main>
-  <h1>To-Do List</h1>
+    <h1>To-Do List</h1>
 
-  <!-- Добавляем нашу форму -->
-  <AddTaskForm onTaskAdded={loadTasks} />
+    {#if !wailsReady && !errorMessage}
+        <div class="warning">
+            Инициализация приложения...
+        </div>
+    {/if}
 
-  <!-- Здесь будет список задач -->
-  {#if loading}
-    <p>Загрузка...</p>
-  {:else}
-    <TaskList {tasks} onTaskUpdated={loadTasks} />
-  {/if}
+    {#if errorMessage}
+        <div class="error">
+            {errorMessage}
+            <button on:click={initializeApp} class="retry-btn">
+                Попробовать снова
+            </button>
+        </div>
+    {/if}
+
+    {#if wailsReady}
+        <AddTaskForm onTaskAdded={loadTasks}/>
+
+        {#if loading}
+            <div class="loading">
+                <p>Загрузка задач...</p>
+            </div>
+        {:else}
+            <TaskList {tasks} onTaskUpdated={loadTasks}/>
+        {/if}
+    {/if}
 </main>
 
 <style>
-  main {
-    padding: 20px;
-    max-width: 800px;
-    margin: 0 auto;
-  }
+    main {
+        padding: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
 
-  h1 {
-    text-align: center;
-    margin-bottom: 30px;
-    color: #333;
-  }
+    h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #333;
+    }
+
+    .warning {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    .loading {
+        text-align: center;
+        color: #666;
+        padding: 20px;
+    }
+
+    .error {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 500;
+        margin-bottom: 20px;
+    }
+
+    .retry-btn {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-left: 10px;
+        font-size: 14px;
+    }
+
+    .retry-btn:hover {
+        background: #c82333;
+    }
 </style>

@@ -1,7 +1,6 @@
-// Типы для Wails runtime
 declare interface Window {
     go: {
-        main: {
+        app: {
             App: {
                 GetAllTasks(): Promise<any[]>;
                 CreateTask(title: string, priority: string, dueDate: string): Promise<any>;
@@ -9,6 +8,7 @@ declare interface Window {
                 ToggleTaskCompletion(id: number): Promise<any>;
                 DeleteTask(id: number): Promise<void>;
                 GetStats(): Promise<Record<string, number>>;
+                TestMethod(): Promise<string>;
             }
         }
     }
