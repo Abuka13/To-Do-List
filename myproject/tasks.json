@@ -18,17 +18,27 @@
   {
     "id": 4,
     "title": "Просрочка",
-    "isCompleted": false,
+    "isCompleted": true,
     "createdAt": "2025-09-16T07:26:14Z",
+    "completedAt": "2025-09-16T10:26:05Z",
     "dueDate": "2025-09-15T17:00:00.000Z",
     "priority": "low"
   },
   {
     "id": 5,
     "title": "Просрочка",
-    "isCompleted": false,
+    "isCompleted": true,
     "createdAt": "2025-09-16T07:27:10Z",
+    "completedAt": "2025-09-16T10:26:04Z",
     "dueDate": "2025-09-16T05:00:00.000Z",
     "priority": "low"
+  },
+  {
+    "id": 6,
+    "title": "Сделать скриншот",
+    "isCompleted": false,
+    "createdAt": "2025-09-16T10:27:04Z",
+    "dueDate": "2025-09-16T11:00:00.000Z",
+    "priority": "medium"
   }
 ]
