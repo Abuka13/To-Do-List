@@ -47,7 +47,7 @@ type Task struct {
 	Priority    Priority `json:"priority"`
 }
 
-// NewTask - конструктор задач. Использовал здесь фабричный паттерн
+// конструктор задач. Использовал здесь фабричный паттерн
 func NewTask(title string, priority Priority, dueDate string) *Task {
 	return &Task{
 		Title:       title,

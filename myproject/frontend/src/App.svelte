@@ -24,7 +24,6 @@
     }
 
     onMount(() => {
-        // Загрузка темы из localStorage
         const savedTheme = localStorage.getItem('theme');
         darkMode = savedTheme === 'dark';
         document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
@@ -104,29 +103,33 @@
         }
 
         const now = new Date();
-        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
 
         switch (dateFilter) {
             case 'today':
                 filtered = filtered.filter(task => {
-                    if (!task.dueDate) return false;
+                    if (!task.dueDate || task.isCompleted) return false;
                     const taskDate = new Date(task.dueDate);
-                    return taskDate >= todayStart && !task.isCompleted;
+                    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const todayEnd = new Date(todayStart);
+                    todayEnd.setDate(todayEnd.getDate() + 1);
+                    return taskDate >= todayStart && taskDate < todayEnd;
                 });
                 break;
             case 'week':
                 filtered = filtered.filter(task => {
-                    if (!task.dueDate) return false;
+                    if (!task.dueDate || task.isCompleted) return false;
                     const taskDate = new Date(task.dueDate);
-                    return taskDate >= weekStart && !task.isCompleted;
+                    const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+                    const weekEnd = new Date(weekStart);
+                    weekEnd.setDate(weekEnd.getDate() + 7);
+                    return taskDate >= weekStart && taskDate < weekEnd;
                 });
                 break;
             case 'overdue':
                 filtered = filtered.filter(task => {
                     if (!task.dueDate || task.isCompleted) return false;
                     const taskDate = new Date(task.dueDate);
-                    return taskDate < todayStart;
+                    return taskDate < now; // ВСЕ просроченные задачи, а не только за сегодня
                 });
                 break;
         }
@@ -231,8 +234,7 @@
                     Просроченные: {allTasks.filter(t => {
                     if (!t.dueDate || t.isCompleted) return false;
                     const taskDate = new Date(t.dueDate);
-                    const todayStart = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
-                    return taskDate < todayStart;
+                    return taskDate < new Date();
                 }).length}
                 </div>
             {/if}
@@ -479,7 +481,6 @@
         }
     }
 
-    /* Анимации */
     @keyframes slideIn {
         from {
             opacity: 0;

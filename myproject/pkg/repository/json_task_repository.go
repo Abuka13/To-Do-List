@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-// JSONTaskRepository - конкретная реализация TaskRepository для хранения в JSON файле.
+// конкретная реализация TaskRepository для хранения в JSON файле.
 type JSONTaskRepository struct {
 	filePath string
 	mu       sync.RWMutex
@@ -19,7 +19,7 @@ type JSONTaskRepository struct {
 	nextID   int
 }
 
-// NewJSONTaskRepository - конструктор репозитория.
+// конструктор репозитория.
 func NewJSONTaskRepository(filePath string) *JSONTaskRepository {
 	repo := &JSONTaskRepository{
 		filePath: filePath,
@@ -36,12 +36,11 @@ func NewJSONTaskRepository(filePath string) *JSONTaskRepository {
 	return repo
 }
 
-// FindAll возвращает все задачи из репозитория.
+// возвращает все задачи из репозитория.
 func (r *JSONTaskRepository) FindAll() ([]*domain.Task, error) {
-	r.mu.RLock() // Блокировка для чтения
+	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	// Возвращаем копию среза, чтобы избежать изменений извне
 	result := make([]*domain.Task, len(r.tasks))
 	copy(result, r.tasks)
 	return result, nil
@@ -80,7 +79,7 @@ func (r *JSONTaskRepository) FindByTitle(title string) ([]*domain.Task, error) {
 
 // Save сохраняет или обновляет задачу в репозитории.
 func (r *JSONTaskRepository) Save(task *domain.Task) error {
-	r.mu.Lock() // Полная блокировка для записи
+	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	if task.ID == 0 {
@@ -104,7 +103,7 @@ func (r *JSONTaskRepository) Save(task *domain.Task) error {
 	return r.persistToFile()
 }
 
-// Delete удаляет задачу по ID.
+// удаляет задачу по ID.
 func (r *JSONTaskRepository) Delete(id int) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -152,13 +151,10 @@ func (r *JSONTaskRepository) loadFromFile() error {
 }
 
 func (r *JSONTaskRepository) persistToFile() error {
-	// Конвертируем в JSON с форматированием
 	data, err := json.MarshalIndent(r.tasks, "", "  ")
 	if err != nil {
 		return err
 	}
-
-	// Создаем файл если не существует, с правами 0644 (rw-r--r--)
 	return os.WriteFile(r.filePath, data, 0644)
 }
 func (r *JSONTaskRepository) FindByFilter(filter domain.TaskFilter) ([]*domain.Task, error) {

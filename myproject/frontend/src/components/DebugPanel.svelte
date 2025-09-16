@@ -1,5 +1,4 @@
 <script>
-    // Убираем экспорт, так как мы используем bind:
     let messages = [];
     let isVisible = false;
 </script>

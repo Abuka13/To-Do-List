@@ -152,9 +152,8 @@
         border-color: var(--accent-color);
     }
 
-    /* Для темной темы - серовый активный цвет */
     [data-theme="dark"] button.active {
-        background: #4a5568; /* Серый цвет для темной темы */
+        background: #4a5568;
         color: white;
         border-color: #4a5568;
     }

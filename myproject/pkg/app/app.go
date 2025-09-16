@@ -48,7 +48,17 @@ func (a *App) CreateTask(title string, priorityStr string, dueDateStr string) (*
 		fmt.Printf("Неверный приоритет '%s', устанавливаем средний\n", priorityStr)
 		priority = domain.PriorityMedium
 	}
+	if dueDateStr != "" {
+		dueTime, err := time.Parse(time.RFC3339, dueDateStr)
+		if err != nil {
+			fmt.Printf("Ошибка парсинга даты: %v\n", err)
+			return nil, fmt.Errorf("неверный формат даты")
+		}
 
+		if dueTime.Before(time.Now().UTC()) {
+			fmt.Printf("Внимание: создается задача с прошедшей датой: %s\n", dueTime)
+		}
+	}
 	result, err := a.taskService.CreateTask(title, priority, dueDateStr)
 	if err != nil {
 		fmt.Printf("Ошибка создания задачи: %v\n", err)

@@ -3,7 +3,6 @@
     export let onTaskUpdated = () => {};
 
     async function toggleTaskCompletion(task) {
-        // ИСПРАВЛЕННЫЙ ПУТЬ!
         if (!window.go?.app?.App?.ToggleTaskCompletion) {
             console.error('Wails runtime недоступен');
             alert('Ошибка: соединение с приложением потеряно');
@@ -24,7 +23,6 @@
     }
 
     async function deleteTask(taskId) {
-        // ИСПРАВЛЕННЫЙ ПУТЬ!
         if (!window.go?.app?.App?.DeleteTask) {
             console.error('Wails runtime недоступен');
             alert('Ошибка: соединение с приложением потеряно');
@@ -156,6 +154,7 @@
         background: white;
         transition: all 0.3s ease;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid transparent;
     }
 
     .task-item:hover {
@@ -166,6 +165,22 @@
     .task-item.completed {
         opacity: 0.7;
         background: #f8f9fa;
+    }
+
+    /* ЦВЕТА ДЛЯ ПРИОРИТЕТОВ */
+    .priority-high {
+        border-left-color: #dc3545 !important;
+        background: linear-gradient(90deg, rgba(220, 53, 69, 0.05) 0%, white 4%);
+    }
+
+    .priority-medium {
+        border-left-color: #fd7e14 !important;
+        background: linear-gradient(90deg, rgba(253, 126, 20, 0.05) 0%, white 4%);
+    }
+
+    .priority-low {
+        border-left-color: #28a745 !important;
+        background: linear-gradient(90deg, rgba(40, 167, 69, 0.05) 0%, white 4%);
     }
 
     .task-content {
@@ -218,6 +233,20 @@
     .task-priority {
         font-size: 12px;
         color: #666;
+        font-weight: 500;
+    }
+
+    /* Цвет текста для приоритетов */
+    .priority-high .task-priority {
+        color: #dc3545;
+    }
+
+    .priority-medium .task-priority {
+        color: #fd7e14;
+    }
+
+    .priority-low .task-priority {
+        color: #28a745;
     }
 
     .task-created {
@@ -239,15 +268,79 @@
         background-color: #ffe6e6;
     }
 
-    .priority-high {
-        border-left: 4px solid #dc3545;
+    /* СТИЛИ ДЛЯ ТЕМНОЙ ТЕМЫ */
+    :global([data-theme="dark"]) .task-item {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
     }
 
-    .priority-medium {
-        border-left: 4px solid #ffc107;
+    :global([data-theme="dark"]) .task-item.completed {
+        background: #4a5568;
+        opacity: 0.8;
     }
 
-    .priority-low {
-        border-left: 4px solid #28a745;
+    :global([data-theme="dark"]) .task-item:hover {
+        background: #3c4758;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    :global([data-theme="dark"]) .priority-high {
+        background: linear-gradient(90deg, rgba(220, 53, 69, 0.15) 0%, #2d3748 4%) !important;
+    }
+
+    :global([data-theme="dark"]) .priority-medium {
+        background: linear-gradient(90deg, rgba(253, 126, 20, 0.15) 0%, #2d3748 4%) !important;
+    }
+
+    :global([data-theme="dark"]) .priority-low {
+        background: linear-gradient(90deg, rgba(40, 167, 69, 0.15) 0%, #2d3748 4%) !important;
+    }
+
+    :global([data-theme="dark"]) .empty-state {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #a0aec0;
+    }
+
+    :global([data-theme="dark"]) .completed-text {
+        color: #a0aec0;
+    }
+
+    :global([data-theme="dark"]) .task-due-date {
+        color: #a0aec0;
+    }
+
+    :global([data-theme="dark"]) .task-due-date.overdue {
+        color: #fc8181;
+    }
+
+    :global([data-theme="dark"]) .overdue-label {
+        color: #fc8181;
+    }
+
+    :global([data-theme="dark"]) .task-priority {
+        color: #a0aec0;
+    }
+
+    :global([data-theme="dark"]) .priority-high .task-priority {
+        color: #fc8181;
+    }
+
+    :global([data-theme="dark"]) .priority-medium .task-priority {
+        color: #f6ad55;
+    }
+
+    :global([data-theme="dark"]) .priority-low .task-priority {
+        color: #68d391;
+    }
+
+    :global([data-theme="dark"]) .task-created {
+        color: #718096;
+    }
+
+    :global([data-theme="dark"]) .delete-button:hover {
+        background-color: rgba(220, 53, 69, 0.3);
+        color: #fc8181;
     }
 </style>

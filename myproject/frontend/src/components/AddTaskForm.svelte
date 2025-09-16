@@ -18,7 +18,16 @@
             alert('Введите название задачи!');
             return;
         }
+        if (newTaskDueDate) {
+            const selectedDate = new Date(newTaskDueDate);
+            const now = new Date();
 
+            if (selectedDate < now) {
+                if (!confirm('Выбранная дата уже прошла. Вы уверены, что хотите создать просроченную задачу?')) {
+                    return;
+                }
+            }
+        }
         try {
             console.log('Отправка запроса на создание задачи...');
 
